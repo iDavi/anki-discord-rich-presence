@@ -1,0 +1,21 @@
+{
+    "enabled": true,
+    "client_id": "1234567890123456789",
+    "details_template": "Reviewing {deck}",
+    "state_template": "{reviewed} cards reviewed",
+    "show_elapsed_time": true,
+    "large_image_key": "anki",
+    "large_image_text": "Anki",
+    "small_image_key": "",
+    "small_image_text": "",
+    "show_idle": true,
+    "idle_details": "Taking a break",
+    "idle_state": "In the deck browser",
+    "webhook_enabled": false,
+    "webhook_url": "",
+    "webhook_username": "Anki",
+    "webhook_avatar_url": "",
+    "webhook_min_cards": 1,
+    "webhook_display_name": "",
+    "webhook_message_template": "**{user}** just finished a study session! 🎉\n📚 Deck: **{deck}**\n🎴 Cards reviewed: **{reviewed}**\n⏱️ Time studied: **{duration}**"
+}
