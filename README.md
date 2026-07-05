@@ -38,29 +38,24 @@ python build.py
 # → dist/anki-discord-rich-presence.ankiaddon
 ```
 
-## First-time setup (required for Rich Presence)
-
-Discord only shows Rich Presence for a registered application, so you set an
-**Application ID** once. It takes about two minutes:
-
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
-   → **New Application**. Name it whatever should appear on your profile
-   (e.g. "Anki").
-2. *(Optional)* Under **Rich Presence → Art Assets**, upload an image named
-   `anki` so an icon shows next to your status.
-3. Copy the **Application ID** from **General Information**.
-4. In Anki: **Tools → Add-ons → Discord Rich Presence → Config**, paste it into
-   `client_id`, and **Save**.
-
-Until an Application ID is set, the webhook still works but the on-profile Rich
-Presence stays off (Anki will remind you once on startup).
-
 ## Usage
 
-With an Application ID set and the Discord desktop app running, start reviewing
-any deck — your Discord profile will show what you're studying. Quick actions
-live under **Tools → Discord Rich Presence** (enable/disable, reconnect, send a
-test webhook).
+With the Discord desktop app running, start reviewing any deck — your Discord
+profile will show what you're studying. No account or key setup is needed; a
+Discord application ships bundled. Quick actions live under **Tools → Discord
+Rich Presence** (enable/disable, reconnect, send a test webhook).
+
+### Use your own app name & artwork (optional)
+
+By default your profile shows the bundled "Anki" application. To use your own
+name/icon instead:
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+   → **New Application** and name it whatever should appear on your profile.
+2. *(Optional)* Under **Rich Presence → Art Assets**, upload an image named
+   `anki` so an icon shows next to your status.
+3. Copy the **Application ID** from **General Information** into the `client_id`
+   config field.
 
 ### Set up the session webhook
 

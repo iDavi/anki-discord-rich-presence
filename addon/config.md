@@ -7,12 +7,13 @@ Reconnect to Discord**.
 ## Rich Presence
 
 - **enabled** — master switch for showing your status on Discord.
-- **client_id** — **required.** The *Application (Client) ID* of a Discord
-  application. Discord only shows Rich Presence for a registered app, so the
-  bundled placeholder does nothing until you replace it. Create an app at
+- **client_id** — the *Application (Client) ID* of a Discord application. A
+  bundled application ships as the default, so Rich Presence works without any
+  setup; the app name/icon shown on your profile just belong to that bundled
+  app. To use your own name and artwork, create an app at
   <https://discord.com/developers/applications>, optionally upload art under
-  *Rich Presence → Art Assets* (name one `anki`), then copy its Application ID
-  from *General Information* into this field. The webhook works without this.
+  *Rich Presence → Art Assets* (name one `anki`), then paste its Application ID
+  from *General Information* here.
 - **details_template** / **state_template** — the two lines shown under your
   name. Available placeholders: `{deck}`, `{reviewed}`, `{duration}`.
 - **show_elapsed_time** — show a live "elapsed" timer for the current session.
