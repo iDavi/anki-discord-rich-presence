@@ -126,9 +126,22 @@ class DiscordIPC:
 
     def _handshake(self) -> None:
         self._send(OP_HANDSHAKE, {"v": 1, "client_id": self.client_id})
-        op, _ = self._recv()
+        op, payload = self._recv()
         if op == OP_CLOSE:
-            raise DiscordIPCError("Discord rejected the handshake")
+            raise DiscordIPCError(
+                "Discord closed the connection during handshake: %s" % payload
+            )
+        # A good handshake replies with a DISPATCH/READY event. An invalid
+        # client_id instead comes back as an ERROR frame (not a socket close),
+        # which we previously mistook for success — so the activity was sent
+        # into a dead session and never displayed.
+        if isinstance(payload, dict) and payload.get("evt") == "ERROR":
+            data = payload.get("data") or {}
+            raise DiscordIPCError(
+                "Discord rejected the client_id %s: %s (code %s). Make sure it "
+                "is a real Application ID from the Developer Portal."
+                % (self.client_id, data.get("message"), data.get("code"))
+            )
 
     def close(self) -> None:
         if not self.connected:

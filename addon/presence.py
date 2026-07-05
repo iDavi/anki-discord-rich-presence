@@ -39,6 +39,8 @@ class PresenceManager:
         self._last_connect_attempt = 0.0
         self._current_key = None  # cheap de-dupe of identical activities
         self._force_reconnect = False
+        self._last_error = None  # last failure message, for diagnostics
+        self._logged_success = False  # log the first accepted activity once
 
     # -- public API (called from the UI thread) -------------------------------
 
@@ -82,6 +84,16 @@ class PresenceManager:
             self._has_pending = True
             self._cond.notify_all()
 
+    def status(self) -> dict:
+        """A snapshot for diagnostics (safe to read from the UI thread)."""
+        ipc = self._ipc
+        return {
+            "connected": bool(ipc is not None and ipc.connected),
+            "client_id": self._client_id,
+            "last_error": self._last_error,
+            "sent_ok": self._logged_success,
+        }
+
     def shutdown(self) -> None:
         with self._cond:
             self._stop = True
@@ -120,6 +132,7 @@ class PresenceManager:
                 self._apply(item)
                 self._last_send = time.time()
             except (DiscordIPCError, OSError) as exc:
+                self._last_error = str(exc)
                 log("presence update failed: %s" % exc)
                 self._drop_connection()
 
@@ -155,7 +168,16 @@ class PresenceManager:
             reply = self._ipc.set_activity(stripped)
             error = DiscordIPC.reply_error(reply)
         if error:
+            self._last_error = error
             log("Discord rejected the activity: %s" % error)
+            return
+        self._last_error = None
+        if not self._logged_success:
+            self._logged_success = True
+            log(
+                "presence set OK: details=%r state=%r"
+                % (item.get("details"), item.get("state"))
+            )
 
     def _ensure_connected(self) -> None:
         if self._force_reconnect:
