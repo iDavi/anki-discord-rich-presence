@@ -197,14 +197,26 @@ class DiscordIPC:
 
     # -- high level -----------------------------------------------------------
 
-    def set_activity(self, activity: Optional[dict]) -> None:
-        """Set (or clear, when ``activity`` is ``None``) the rich presence."""
+    def set_activity(self, activity: Optional[dict]) -> dict:
+        """Set (or clear, when ``activity`` is ``None``) the rich presence.
+
+        Returns Discord's reply. Discord answers every frame; a reply with
+        ``evt == "ERROR"`` means the activity was rejected (e.g. an invalid
+        image asset key), in which case nothing is displayed.
+        """
         payload = {
             "cmd": "SET_ACTIVITY",
             "args": {"pid": os.getpid(), "activity": activity},
             "nonce": "%d" % time.time_ns(),
         }
         self._send(OP_FRAME, payload)
-        # Discord replies to every frame; read and discard it so the socket
-        # buffer doesn't fill up. Failures here just mean a stale connection.
-        self._recv()
+        _, reply = self._recv()
+        return reply
+
+    @staticmethod
+    def reply_error(reply: dict) -> Optional[str]:
+        """Return a human-readable error if ``reply`` is a rejection, else None."""
+        if isinstance(reply, dict) and reply.get("evt") == "ERROR":
+            data = reply.get("data") or {}
+            return str(data.get("message") or data.get("code") or "unknown error")
+        return None

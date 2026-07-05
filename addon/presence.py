@@ -141,8 +141,21 @@ class PresenceManager:
                 self._ipc.set_activity(None)
             return
         self._ensure_connected()
-        if self._ipc is not None:
-            self._ipc.set_activity(item)
+        if self._ipc is None:
+            return
+        reply = self._ipc.set_activity(item)
+        error = DiscordIPC.reply_error(reply)
+        if error and isinstance(item, dict) and item.get("assets"):
+            # The most common rejection is an image asset key that isn't
+            # uploaded to the Discord application. Text-only presence still
+            # works, so drop the images and try again instead of showing
+            # nothing.
+            log("Discord rejected the activity (%s); retrying without images" % error)
+            stripped = {k: v for k, v in item.items() if k != "assets"}
+            reply = self._ipc.set_activity(stripped)
+            error = DiscordIPC.reply_error(reply)
+        if error:
+            log("Discord rejected the activity: %s" % error)
 
     def _ensure_connected(self) -> None:
         if self._force_reconnect:

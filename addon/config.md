@@ -18,8 +18,10 @@ Reconnect to Discord**.
   name. Available placeholders: `{deck}`, `{reviewed}`, `{duration}`.
 - **show_elapsed_time** — show a live "elapsed" timer for the current session.
 - **large_image_key** / **small_image_key** — names of art assets uploaded to
-  your Discord application. Leave blank to show no image. `*_text` is the
-  tooltip shown when hovering the image.
+  your Discord application (under *Rich Presence → Art Assets*). Leave blank to
+  show no image (the default). **Do not put a name here unless you have uploaded
+  an asset with that exact name** — Discord rejects the whole presence if the
+  key doesn't exist. `*_text` is the tooltip shown when hovering the image.
 - **show_idle** — when `true`, keep a presence up (using **idle_details** /
   **idle_state**) even when you're not actively reviewing. When `false`, the
   presence is cleared as soon as you leave the reviewer.

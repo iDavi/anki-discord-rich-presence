@@ -38,7 +38,7 @@ DEFAULTS = {
     "details_template": "Reviewing {deck}",
     "state_template": "{reviewed} cards reviewed",
     "show_elapsed_time": True,
-    "large_image_key": "anki",
+    "large_image_key": "",
     "large_image_text": "Anki",
     "small_image_key": "",
     "small_image_text": "",
