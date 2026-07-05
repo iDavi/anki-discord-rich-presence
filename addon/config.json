@@ -1,6 +1,6 @@
 {
     "enabled": true,
-    "client_id": "1234567890123456789",
+    "client_id": "1523401615619657880",
     "details_template": "Reviewing {deck}",
     "state_template": "{reviewed} cards reviewed",
     "show_elapsed_time": true,

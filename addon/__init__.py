@@ -22,16 +22,19 @@ from .webhook import send_webhook
 
 GITHUB_URL = "https://github.com/iDavi/anki-discord-rich-presence"
 
-# Shipped as the default so the config is valid JSON, but it is not a real
-# Discord application. Rich Presence stays dormant until the user sets their own
-# Application ID (see the setup guide / config.md).
+# The bundled Discord application id. Rich Presence works out of the box with
+# it; users can swap in their own app id to control the name/artwork shown.
+DEFAULT_CLIENT_ID = "1523401615619657880"
+
+# The old placeholder id from pre-release configs. Still treated as "unset" so
+# anyone carrying it in a saved config gets guided rather than silently broken.
 PLACEHOLDER_CLIENT_ID = "1234567890123456789"
 
 # Every recognised config key with its default. Real config is merged on top of
 # this so upgrades that add keys keep working with old saved configs.
 DEFAULTS = {
     "enabled": True,
-    "client_id": "1234567890123456789",
+    "client_id": "1523401615619657880",
     "details_template": "Reviewing {deck}",
     "state_template": "{reviewed} cards reviewed",
     "show_elapsed_time": True,
