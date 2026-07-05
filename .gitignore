@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+dist/
+*.ankiaddon
+.DS_Store
+addon/meta.json
