@@ -14,7 +14,7 @@ from typing import Optional
 
 from aqt import gui_hooks, mw
 from aqt.qt import QAction, qconnect
-from aqt.utils import openLink, tooltip
+from aqt.utils import openLink, showInfo, tooltip
 
 from .log import log
 from .presence import PresenceManager
@@ -38,7 +38,7 @@ DEFAULTS = {
     "details_template": "Reviewing {deck}",
     "state_template": "{reviewed} cards reviewed",
     "show_elapsed_time": True,
-    "large_image_key": "anki",
+    "large_image_key": "",
     "large_image_text": "Anki",
     "small_image_key": "",
     "small_image_text": "",
@@ -368,6 +368,10 @@ class DiscordAddon:
         qconnect(reconnect.triggered, self._reconnect)
         menu.addAction(reconnect)
 
+        status = QAction("Show Discord status…", mw)
+        qconnect(status.triggered, self._show_status)
+        menu.addAction(status)
+
         menu.addSeparator()
 
         test = QAction("Send test webhook", mw)
@@ -385,6 +389,31 @@ class DiscordAddon:
         self._save_config()
         self.refresh_presence()
         tooltip("Discord Rich Presence %s" % ("enabled" if checked else "disabled"))
+
+    def _show_status(self) -> None:
+        st = self.presence.status()
+        lines = [
+            "Discord Rich Presence status",
+            "",
+            "Add-on enabled: %s" % ("yes" if self.config.get("enabled") else "no"),
+            "Application ID: %s" % st["client_id"],
+            "Valid Application ID: %s" % ("yes" if self._has_valid_client_id() else "no"),
+            "Connected to Discord: %s" % ("yes" if st["connected"] else "no"),
+            "Activity accepted: %s" % ("yes" if st["sent_ok"] else "not yet"),
+            "Last error: %s" % (st["last_error"] or "none"),
+            "",
+            "Current Anki state: %s" % self._current_state(),
+            "In a review session: %s" % ("yes" if self._session_active else "no"),
+        ]
+        if st["connected"] and st["sent_ok"] and not st["last_error"]:
+            lines += [
+                "",
+                "Anki is sending your presence successfully. If it still isn't "
+                "visible on your profile, enable Discord → Settings → Activity "
+                "Privacy → “Share your detected activities with others” "
+                "(a.k.a. “Display current activity as a status message”).",
+            ]
+        showInfo("\n".join(lines), title="Discord Rich Presence")
 
     def _reconnect(self) -> None:
         self.presence.set_client_id(self.config["client_id"])
