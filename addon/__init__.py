@@ -22,6 +22,11 @@ from .webhook import send_webhook
 
 GITHUB_URL = "https://github.com/iDavi/anki-discord-rich-presence"
 
+# Shipped as the default so the config is valid JSON, but it is not a real
+# Discord application. Rich Presence stays dormant until the user sets their own
+# Application ID (see the setup guide / config.md).
+PLACEHOLDER_CLIENT_ID = "1234567890123456789"
+
 # Every recognised config key with its default. Real config is merged on top of
 # this so upgrades that add keys keep working with old saved configs.
 DEFAULTS = {
@@ -90,6 +95,7 @@ class DiscordAddon:
         self._session_reviewed = 0
         self._session_deck = ""
         self._enabled_action: Optional[QAction] = None
+        self._warned_setup = False
 
     # -- config ---------------------------------------------------------------
 
@@ -128,8 +134,12 @@ class DiscordAddon:
         except Exception:
             pass
         # Reflect the initial state once the profile is ready.
-        gui_hooks.profile_did_open.append(self.refresh_presence)
+        gui_hooks.profile_did_open.append(self._on_profile_open)
         gui_hooks.profile_will_close.append(self._on_profile_close)
+
+    def _has_valid_client_id(self) -> bool:
+        cid = str(self.config.get("client_id", "")).strip()
+        return cid.isdigit() and 17 <= len(cid) <= 20 and cid != PLACEHOLDER_CLIENT_ID
 
     def _register_hooks(self) -> None:
         gui_hooks.state_did_change.append(self._on_state_change)
@@ -139,6 +149,21 @@ class DiscordAddon:
             gui_hooks.reviewer_did_answer_card.append(self._on_answer_card)
 
     # -- Anki hooks -----------------------------------------------------------
+
+    def _on_profile_open(self) -> None:
+        self._maybe_warn_setup()
+        self.refresh_presence()
+
+    def _maybe_warn_setup(self) -> None:
+        if self._warned_setup:
+            return
+        if self.config.get("enabled") and not self._has_valid_client_id():
+            self._warned_setup = True
+            tooltip(
+                "Discord Rich Presence: set your Discord Application ID in the "
+                "add-on config to start showing your reviews.",
+                period=6000,
+            )
 
     def _on_state_change(self, new_state: str, old_state: str) -> None:
         if new_state == "review" and not self._session_active:
@@ -201,7 +226,9 @@ class DiscordAddon:
     # -- presence -------------------------------------------------------------
 
     def refresh_presence(self, state: Optional[str] = None) -> None:
-        if not self.config.get("enabled"):
+        if not self.config.get("enabled") or not self._has_valid_client_id():
+            # Nothing to show, and connecting with a bogus id would just fail
+            # in a loop. Webhooks are independent and keep working.
             self.presence.clear()
             return
         if state is None:

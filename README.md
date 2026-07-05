@@ -38,13 +38,29 @@ python build.py
 # → dist/anki-discord-rich-presence.ankiaddon
 ```
 
+## First-time setup (required for Rich Presence)
+
+Discord only shows Rich Presence for a registered application, so you set an
+**Application ID** once. It takes about two minutes:
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+   → **New Application**. Name it whatever should appear on your profile
+   (e.g. "Anki").
+2. *(Optional)* Under **Rich Presence → Art Assets**, upload an image named
+   `anki` so an icon shows next to your status.
+3. Copy the **Application ID** from **General Information**.
+4. In Anki: **Tools → Add-ons → Discord Rich Presence → Config**, paste it into
+   `client_id`, and **Save**.
+
+Until an Application ID is set, the webhook still works but the on-profile Rich
+Presence stays off (Anki will remind you once on startup).
+
 ## Usage
 
-Once installed and with Discord running, start reviewing any deck — your Discord
-profile will show what you're studying. Configure everything under
-**Tools → Add-ons → Discord Rich Presence → Config**, and find quick actions
-under **Tools → Discord Rich Presence** (enable/disable, reconnect, send a test
-webhook).
+With an Application ID set and the Discord desktop app running, start reviewing
+any deck — your Discord profile will show what you're studying. Quick actions
+live under **Tools → Discord Rich Presence** (enable/disable, reconnect, send a
+test webhook).
 
 ### Set up the session webhook
 
@@ -62,16 +78,6 @@ webhook).
 
 Use **Tools → Discord Rich Presence → Send test webhook** to check it without
 finishing a real session.
-
-### Use your own app name & artwork (optional)
-
-The presence works out of the box, but the app name and images on your profile
-belong to the bundled Discord application. To use your own:
-
-1. Create an application at the
-   [Discord Developer Portal](https://discord.com/developers/applications).
-2. Upload images under **Rich Presence → Art Assets** (e.g. one named `anki`).
-3. Copy the **Application ID** into the `client_id` config field.
 
 ## Configuration reference
 
